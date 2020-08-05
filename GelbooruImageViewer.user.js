@@ -945,7 +945,7 @@ Main = {
     let a, id, alt;
     if (!(typeof node === "object" && node.nodeType === 1)) return;
     if (node.tagName === "LI" && String(node.id)[0] === "p" && ~String(node.className).indexOf("creator-id-")) return setTimeout(Main.myImuoto, 0, node);
-    if (site.gelbooru && node.classList.contains("thumbnail-preview")) node = Main.gelbooruFix(node);
+    if (site.gelbooru && node.classList.contains("thumbnail-preview") && node.tagName !== "IMG") node = Main.gelbooruFix(node);
     if (node.matches(Main.sel) && (a = node.firstElementChild) && !a.dataset.full) {
       alt = $("img[alt]", node);
       if (!(alt && (alt = alt.title || alt.alt)))
@@ -1048,6 +1048,7 @@ Main = {
       img.removeAttribute(`data-${key}`);
     }
     const span = el.firstElementChild;
+    span.className = "thumb";
     el.parentNode.replaceChild(span, el);
     return span;
   },
