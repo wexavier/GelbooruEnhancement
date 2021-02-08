@@ -891,8 +891,8 @@ Main = {
     switch(site.name) {
      case "gelbooru":
       Main.r[0] = /<a href="?([^">]+)"?[^>]*>Orig/;
-      Main.r[1] = /src="?([^">]+)"? id="?image"?[^>]*\/>/;
-      Main.css += "span.thumb {\n  float: left;\n  display: inline-block;\n  width: 180px;\n  height: 180px;\n  text-align: center\n}\nspan.thumb + center::before {\n  content: '';\n  display: block;\n  clear: both\n}\n.slideshow hr {\n  margin: initial;\nborder: initial;\n  height: initial\n}";
+      Main.r[1] = /id="?image"?[^>]*\ src="?([^">]+)"?/;
+      Main.css += "span.thumb {\n  float: left;\n  display: inline-block;\n  width: 180px;\n  height: 180px;\n  text-align: center\n}\nspan.thumb img {\n max-width: 170px; max-height: 170px;\n}\nspan.thumb + center::before {\n  content: '';\n  display: block;\n  clear: both\n}\n.slideshow hr {\n  margin: initial;\nborder: initial;\n  height: initial\n}";
       break;
      case "splatoon": case "booru":
       Main.r[0] = Main.r[1] = /<img alt="img" src="([^"]+)/i;
@@ -1047,8 +1047,11 @@ Main = {
       img.setAttribute("src", img.getAttribute(`data-${key}`));
       img.removeAttribute(`data-${key}`);
     }
-    const span = el.firstElementChild;
-    span.className = "thumb";
+    const span = $.c('span')
+    const span_id = 's' + el.firstElementChild.id.slice(1)
+    span.appendChild(el.firstElementChild);
+    span.classList.add("thumb");
+    span.id = span_id;
     el.parentNode.replaceChild(span, el);
     return span;
   },
@@ -1091,6 +1094,7 @@ Main = {
     if (slideshow) Btn.cb();
     slideshow = !(a = $.current());
     Main.el = $.rm(Main.el);
+    if (site.gelbooru) $("#container").style.display = "";
     d.body.classList.remove("sliding");
     a.classList.add("outlined");
     $.off("mousemove", $.zoom);
@@ -1115,6 +1119,7 @@ Main = {
   _on: e => e.button === 1 && $.keyDown({ keyCode: 38, event: e }),
   on(a) {
     if (site.sankakucomplex) uW.Sankaku.Pagination.auto_enabled = false;
+    if (site.gelbooru) $("#container").style.display = "None";
     d.body.classList.add("sliding");
     {
       const arr = $$("a.outlined[data-full]");
@@ -1133,7 +1138,7 @@ Main = {
     $.on("keyup", $.keyUp);
     $.on("keydown", $.keyDown);
     $.on("mousemove", $.zoom);
-    Pos.fn(); Btn.fn(); $.preload();
+    Pos.fn(); Btn.fn(); //$.preload();
   },
   isGif(match) {
     return match && match[1] ? match[1].toLowerCase() === "gif" : null;
